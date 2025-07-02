@@ -12,6 +12,22 @@ Este proyecto implementa un sistema de gestión de laboratorios universitarios u
 
 La importancia de las consultas avanzadas y relaciones en bases de datos NoSQL como MongoDB radica en la capacidad de modelar datos de manera flexible mientras se mantiene la integridad referencial y se optimizan las consultas para obtener información relacionada de manera eficiente.
 
+## Objetivos
+
+### Objetivo General
+Desarrollar un sistema de gestión de laboratorios universitarios que permita la administración eficiente de usuarios, laboratorios y equipos, utilizando MongoDB y Mongoose, y que facilite la realización de consultas avanzadas para optimizar la toma de decisiones.
+
+### Objetivos Específicos
+1. **Modelar Datos**: Diseñar y crear modelos de datos para usuarios, laboratorios y equipos que reflejen las relaciones y validaciones necesarias para el correcto funcionamiento del sistema.
+
+2. **Desarrollar Consultas Avanzadas**: Implementar consultas complejas utilizando el Aggregation Framework de MongoDB para obtener estadísticas y reportes relevantes sobre el uso de laboratorios y equipos.
+
+3. **Configurar Entorno de Desarrollo**: Establecer un entorno de desarrollo utilizando Docker y Docker Compose que permita la fácil implementación y gestión de los servicios necesarios para el proyecto.
+
+4. **Optimizar Consultas**: Utilizar técnicas de población de datos con Mongoose para optimizar las consultas entre colecciones y mejorar la eficiencia del acceso a la información.
+
+5. **Evaluar el Rendimiento**: Realizar pruebas de rendimiento y usabilidad del sistema para asegurar que cumple con los requisitos establecidos y se adapta a las necesidades de los usuarios.
+
 ## Tecnologías Utilizadas
 
 - **Node.js** - Entorno de ejecución JavaScript
