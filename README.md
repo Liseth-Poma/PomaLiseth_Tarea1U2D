@@ -1,327 +1,319 @@
-# Gestión de Laboratorios - MongoDB con Mongoose
 
-**Estudiante:** Liseth Carolina Poma Lagos  
-**Carrera:** Ingeniería en TI  
-**Curso:** Aplicaciones Distribuidas  
-**Fecha:** 1 de julio de 2025
+# Construcción de una API RESTful con Base de Datos NoSQL y ORM (Mongoose)
+
+**Liseth Carolina Poma Lagos**
+
+---
+
+## RESUMEN
+
+En esta práctica se desarrolló una API RESTful utilizando el framework Express.js y el ORM Mongoose para gestionar una base de datos MongoDB. El objetivo principal fue implementar operaciones CRUD sobre una entidad `Course`, definiendo su modelo, rutas y controladores, y validando los datos recibidos. Se configuró la estructura modular del proyecto y se integró la herramienta `nodemon` para el reinicio automático del servidor. Además, se realizaron pruebas de los endpoints mediante Postman, verificando tanto las respuestas como las restricciones de validación. Finalmente, se utilizó mongo-express para visualizar las colecciones creadas, y se observó el correcto funcionamiento del sistema, cumpliendo con los objetivos planteados.
+
+**Palabras Claves**: API RESTful, Mongoose, MongoDB
+
+---
+
+## 1. INTRODUCCIÓN
+
+El desarrollo de aplicaciones modernas exige estructuras eficientes para la gestión de datos. En este laboratorio, se implementó una API RESTful utilizando Node.js, Express y Mongoose, para trabajar con una base de datos NoSQL (MongoDB). El enfoque se centró en modularizar el código, aplicar principios CRUD y establecer validaciones en los modelos de datos. Las actividades realizadas permitieron aplicar conocimientos teóricos y prácticos sobre la construcción de backends eficientes, configurando el entorno de desarrollo y validando su funcionamiento mediante herramientas como Postman y mongo-express.
+
+---
+
+## 2. OBJETIVO(S)
+
+**2.1 Objetivo General:**
+
+- Desarrollar una API RESTful con una base de datos NoSQL utilizando MongoDB y Mongoose para realizar operaciones CRUD sobre una entidad.
+
+**2.2 Objetivos Específicos:**
+
+- Implementar una estructura modular del proyecto.
+- Configurar Mongoose como ORM para la base de datos.
+- Definir rutas, controladores y modelos para la entidad `Course`.
+- Validar el funcionamiento de la API mediante pruebas en Postman.
+
+---
+
+## 3. MARCO TEÓRICO
+
+Una API RESTful (Representational State Transfer) es un conjunto de principios para diseñar servicios web que permiten la comunicación entre sistemas a través del protocolo HTTP. MongoDB es una base de datos NoSQL orientada a documentos, mientras que Mongoose es una biblioteca de Node.js que proporciona una solución basada en esquemas para modelar los datos en MongoDB. Express.js es un framework minimalista de backend que facilita la creación de servidores y rutas HTTP. Juntos, estos componentes permiten el desarrollo rápido y organizado de aplicaciones backend modernas.
+
+---
+
+## 4. DESCRIPCIÓN DEL PROCEDIMIENTO
+
+### Paso 1: Instalar dependencias básicas
+
+```bash
+npm init
+npm install mongoose
+npm install --save-dev nodemon
+
+````
+**Iniciar Proyecto**
+
+<img src="https://imgur.com/qoMibNU.png" alt="npm init" width="40%" />
+
+**Instalar mongoose**
+
+<img src="https://imgur.com/WwrMuL3.png" alt="Instalar mongoose" width="40%" />
+
+**Instalar nodemon**
+
+<img src="https://imgur.com/T4YzHBb.png" alt="Instalar nodemon" width="40%" />
 
 
-## Introducción
-
-Este proyecto implementa un sistema de gestión de laboratorios universitarios utilizando MongoDB como base de datos NoSQL y Mongoose como ODM (Object Document Mapping). El sistema permite gestionar usuarios, laboratorios y equipos, implementando relaciones entre colecciones y consultas avanzadas.
-
-La importancia de las consultas avanzadas y relaciones en bases de datos NoSQL como MongoDB radica en la capacidad de modelar datos de manera flexible mientras se mantiene la integridad referencial y se optimizan las consultas para obtener información relacionada de manera eficiente.
-
-## Tecnologías Utilizadas
-
-- **Node.js** - Entorno de ejecución JavaScript
-- **Express.js** - Framework web para Node.js
-- **MongoDB** - Base de datos NoSQL
-- **Mongoose** - ODM para MongoDB
-- **Docker & Docker Compose** - Containerización
-- **Mongo Express** - Interface web para MongoDB
-
-## Entorno de Desarrollo
-
-### Configuración con Docker
-
-El proyecto utiliza Docker Compose para levantar los siguientes servicios:
-1. **MongoDB**: Base de datos principal en el puerto 2717
-![Imgur](https://imgur.com/eNtnRC5.png)
-2. **Mongo Express**: Interface web para administrar MongoDB en el puerto 8081
-![Imgur](https://imgur.com/tEqsCAC.png)
-
-**Entorno Docker funcionando**
-
-![Imgur](https://imgur.com/nbRT5BF.png)
-
-### Dependencias Instaladas
+Agregar en `package.json`:
 
 ```json
-{
-  "express": "^4.18.2",
-  "mongoose": "^7.5.0",
-  "dotenv": "^16.3.1"
+"scripts": {
+  "start": "nodemon server.js"
 }
 ```
 
-## Modelado de Datos
+---
 
-El sistema implementa tres modelos principales con sus respectivas relaciones:
+### Paso 2: Estructura del Proyecto
 
-### 1. Modelo Usuario
-- **Campos**: nombre, apellido, correo, rol, fechaRegistro, activo
-- **Validaciones**: correo único y formato válido
-- **Roles**: estudiante, profesor, administrador
-
-### 2. Modelo Laboratorio
-- **Campos**: nombre, ubicación, capacidad, descripción, responsable, horarioDisponible, activo
-- **Relación**: Referencia a Usuario (responsable)
-- **Validaciones**: capacidad entre 1 y 100
-
-### 3. Modelo Equipo
-- **Campos**: nombre, tipo, marca, modelo, numeroSerie, estado, laboratorio, fechaAdquisicion, especificaciones, activo
-- **Relación**: Referencia a Laboratorio
-- **Estados**: disponible, en_uso, mantenimiento, dañado
-
-### Diagrama de Relaciones
-
-```
-Usuario (1) -----> (N) Laboratorio
-                       |
-                       |
-                       v
-                   (1) Laboratorio -----> (N) Equipo
+```plaintext
+api-rest-orm/
+├── src/
+│   ├── controllers/
+│   │   └── course.controller.js
+│   ├── models/
+│   │   └── course.model.js
+│   ├── routes/
+│   │   └── course.routes.js
+│   └── index.js
+├── .env
+├── package.json
+└── README.md
 ```
 
-## Consultas Implementadas
+---
 
-### 1. Listar todos los usuarios
-```javascript
-const usuarios = await Usuario.find();
-```
+### Paso 3: Configuración del ORM - Mongoose
 
-<img src="https://imgur.com/Ic2DWfe.png" width="300" />
+Archivo `src/index.js`:
 
-**Endpoint**: `GET /api/consultas/usuarios-todos`
+```js
+const express = require("express");
+const mongoose = require("mongoose");
+const courseRoutes = require("./routes/course.routes");
 
-<img src="https://imgur.com/qi5yxsi.png" width="300" />
+const app = express();
+app.use(express.json());
 
-### 2. Buscar laboratorios que tengan equipos disponibles
-```javascript
-const equiposDisponibles = await Equipo.find({ estado: 'disponible' })
-  .populate('laboratorio')
-  .distinct('laboratorio');
-```
+const connectionString =
+  "mongodb://admin:password123@localhost:27017/espe-mongoose?authSource=admin";
 
-<img src="https://imgur.com/TBFsmLm.png" width="300" />
+mongoose
+  .connect(connectionString)
+  .then(() => console.log("Conectado a MongoDB"))
+  .catch((error) => console.error("Error de conexión:", error));
 
-**Endpoint**: `GET /api/consultas/laboratorios-equipos-disponibles`
+app.use("/", courseRoutes);
 
-<img src="https://imgur.com/lkfdzeE.png" width="300" />
-
-### 3. Contar cantidad de equipos por estado
-```javascript
-const conteo = await Equipo.aggregate([
-  {
-    $group: {
-      _id: "$estado",
-      cantidad: { $sum: 1 }
-    }
-  }
-]);
-```
-
-<img src="https://imgur.com/xPw8u4w.png" width="300" />
-
-**Endpoint**: `GET /api/consultas/equipos-por-estado`
-
-<img src="https://imgur.com/UlxP1EC.png" width="300" />
-
-### 4. Buscar usuarios cuyo correo termine en @universidad.edu
-```javascript
-const usuarios = await Usuario.find({ 
-  correo: { $regex: /@universidad\.edu$/, $options: 'i' }
+app.listen(8080, () => {
+  console.log("Servidor escuchando en el puerto 8080");
 });
 ```
 
-<img src="https://imgur.com/mQI0Vkn.png" width="300" />
+---
 
-**Endpoint**: `GET /api/consultas/usuarios-universidad`
+### Paso 4: Crear Controladores y Rutas
 
-<img src="https://imgur.com/b2hk86t.png" width="300" />
+#### `controllers/course.controller.js`:
 
-### 5. Promedio de equipos por laboratorio usando aggregate
-```javascript
-const resultado = await Equipo.aggregate([
-  {
-    $lookup: {
-      from: 'laboratorios',
-      localField: 'laboratorio',
-      foreignField: '_id',
-      as: 'laboratorioInfo'
-    }
-  },
-  {
-    $group: {
-      _id: null,
-      promedioEquipos: { $avg: '$cantidadEquipos' }
-    }
+```js
+const Course = require("../models/course.model");
+
+const createCourse = async (req, res) => {
+  try {
+    const course = await Course.create(req.body);
+    res.status(201).json(course);
+  } catch (error) {
+    console.error("Error al crear el curso:", error);
+    res.status(500).json({ error: error.message });
   }
-]);
+};
+
+const getCourses = async (req, res) => {
+  try {
+    const courses = await Course.find();
+    res.json(courses);
+  } catch (error) {
+    console.error("Error al obtener cursos:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getCourseById = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    res.json(course);
+  } catch (error) {
+    console.error("Error al obtener el curso:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const updateCourse = async (req, res) => {
+  try {
+    const course = await Course.findByIdAndUpdate(
+      req.params.id,
+      {
+        numberOfTopics: req.body.numberOfTopics || 0,
+        publishedAt: new Date(),
+      },
+      { new: true }
+    );
+    res.json(course);
+  } catch (error) {
+    console.error("Error al actualizar el curso:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteCourse = async (req, res) => {
+  try {
+    await Course.findByIdAndDelete(req.params.id);
+    res.json({ message: "Curso eliminado" });
+  } catch (error) {
+    console.error("Error al eliminar el curso:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createCourse,
+  getCourses,
+  getCourseById,
+  updateCourse,
+  deleteCourse,
+};
+
 ```
 
-<img src="https://imgur.com/9Fz7qMX.png" width="300" />
+#### `routes/course.routes.js`:
 
-**Endpoint**: `GET /api/consultas/promedio-equipos-laboratorio`
+```js
+const express = require("express");
+const router = express.Router();
+const courseController = require("../controllers/course.controller");
 
-<img src="https://imgur.com/eEqIqmb.png" width="300" />
+router.post("/course", courseController.createCourse);
+router.get("/course", courseController.getCourses);
+router.get("/course/:id", courseController.getCourseById);
+router.put("/course/:id", courseController.updateCourse);
+router.delete("/course/:id", courseController.deleteCourse);
 
-## Relaciones entre Colecciones
-
-### Relación Usuario → Laboratorio
-Implementada mediante referencia directa usando ObjectId:
-```javascript
-responsable: {
-  type: Schema.Types.ObjectId,
-  ref: 'Usuario',
-  required: true
-}
+module.exports = router;
 ```
 
-### Relación Laboratorio → Equipo
-Implementada mediante referencia directa usando ObjectId:
-```javascript
-laboratorio: {
-  type: Schema.Types.ObjectId,
-  ref: 'Laboratorio',
-  required: true
-}
+---
+
+### Paso 5: Configurar el Modelo
+
+#### `models/course.model.js`:
+
+```js
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+
+const courseSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    minlength: [10, "No se cumple con la longitud mínima de 10 caracteres"],
+    maxlength: 300,
+  },
+  numberOfTopics: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 40,
+  },
+  publishedAt: Date,
+});
+
+module.exports = mongoose.model("Course", courseSchema);
 ```
 
-### Uso de .populate()
-Para obtener datos relacionados se utiliza el método .populate():
-```javascript
-const laboratorios = await Laboratorio.find().populate('responsable');
-const equipos = await Equipo.find().populate('laboratorio');
-```
+---
 
-## Instrucciones de Ejecución
+### Paso 6: Ejecutar y Validar
 
-### Paso a paso para levantar el entorno
+**Levantar contenedores:**  
+<img src="https://imgur.com/Ok4KXkS.png" alt="Levantamiento de contenedores" width="50%" />
 
-1. **Clonar el repositorio**
-```bash
-git clone https://github.com/Liseth-Poma/PomaLiseth_Tarea1U2D
-cd POMALISETH_TAREA1U2D
-```
+**Iniciar el servidor:**
 
-2. **Instalar dependencias**
-```bash
-npm install
-```
-
-3. **Levantar los contenedores Docker**
-```bash
-docker-compose up -d
-```
-
-4. **Verificar que los servicios estén corriendo**
-```bash
-docker-compose ps
-```
-
-5. **Insertar datos de prueba**
-```bash
-node seed.js
-```
-
-6. **Iniciar el servidor Node.js**
 ```bash
 node index.js
-```
+````
 
-### Acceso a los servicios
+<img src="https://imgur.com/Sfo9MaS.png" alt="Servidor funcionando" width="40%" />
 
-- **API REST**: http://localhost:8080
-- **Mongo Express**: http://localhost:8081
-  - Usuario: admin
-  - Contraseña: admin123
+**Probar en Postman:**
 
-### Endpoints disponibles
+* Crear curso:
 
-#### CRUD Básico
-- `POST /api/usuario` - Crear usuario
-- `GET /api/usuarios` - Listar usuarios
-- `POST /api/laboratorio` - Crear laboratorio
-- `GET /api/laboratorios` - Listar laboratorios
-- `POST /api/equipo` - Crear equipo
-- `GET /api/equipos` - Listar equipos
+  <img src="https://imgur.com/22TzvJW.png" alt="Crear curso" width="30%" />
+  
+* Obtener curso por ID:
 
-#### Consultas Avanzadas
-- `GET /api/consultas/usuarios-todos`
-- `GET /api/consultas/laboratorios-equipos-disponibles`
-- `GET /api/consultas/equipos-por-estado`
-- `GET /api/consultas/usuarios-universidad`
-- `GET /api/consultas/promedio-equipos-laboratorio`
+  <img src="https://imgur.com/8ypORI8.png" alt="Obtener curso" width="30%" />
+  
+* Obtener todos los cursos:
 
-## Estructura del Proyecto
+  <img src="https://imgur.com/hjfjZoc.png" alt="Obtener cursos" width="30%" />
 
-```
-📁 POMALISETH_LAB1U2/
-├── 📁 src/
-│   ├── 📁 controllers/
-│   │   └── 📄 main.controller.js
-│   ├── 📁 models/
-│   │   ├── 📄 usuario.model.js
-│   │   ├── 📄 laboratorio.model.js
-│   │   └── 📄 equipo.model.js
-│   └── 📁 routes/
-│       └── 📄 main.routes.js
-├── 📄 docker-compose.yml
-├── 📄 index.js
-├── 📄 seed.js
-├── 📄 package.json
-└── 📄 README.md
-```
+* Actualizar curso:
 
-## Análisis Técnico
+  <img src="https://imgur.com/zvKnuBM.png" alt="Actualizar curso" width="30%" />
+  
+* Eliminar curso:
 
-### Operadores MongoDB Utilizados
+  <img src="https://imgur.com/USMEWRF.png" alt="Eliminar curso" width="30%" />
 
-1. **$regex**: Para búsquedas con expresiones regulares
-```javascript
-{ correo: { $regex: /@universidad\.edu$/, $options: 'i' } }
-```
+**Validaciones funcionando:** 
 
-2. **$group**: Para agrupar documentos
-```javascript
-{ $group: { _id: "$estado", cantidad: { $sum: 1 } } }
-```
+<img src="https://imgur.com/9wjx2E6.png" alt="Validación fallida" width="40%" />
 
-3. **$lookup**: Para realizar joins entre colecciones
-```javascript
-{
-  $lookup: {
-    from: 'laboratorios',
-    localField: 'laboratorio',
-    foreignField: '_id',
-    as: 'laboratorioInfo'
-  }
-}
-```
+**Vista en mongo-express:** 
 
-4. **$avg**: Para calcular promedios
-```javascript
-{ $avg: '$cantidadEquipos' }
-```
+<img src="https://imgur.com/v5HsYLR.png" alt="Vista mongo-express" width="40%" />
 
-5. **$in**: Para búsquedas en arrays
-```javascript
-{ _id: { $in: equiposDisponibles } }
-```
+---
 
-### Ventajas del Modelado NoSQL Implementado
+## 5. ANÁLISIS DE RESULTADOS
 
-1. **Flexibilidad de esquemas**: Los documentos pueden tener estructuras diferentes
-2. **Escalabilidad horizontal**: MongoDB maneja grandes volúmenes de datos
-3. **Consultas complejas**: Aggregation Framework permite análisis avanzados
-4. **Relaciones eficientes**: Referencias y población optimizan consultas
+Durante la ejecución de la práctica, se observó que los endpoints desarrollados respondieron correctamente a las operaciones CRUD. Las validaciones aplicadas en el modelo permitieron restringir datos erróneos, como descripciones demasiado cortas. Las pruebas realizadas en Postman demostraron que la API responde con los códigos de estado HTTP adecuados. Además, al observar las colecciones desde mongo-express, se evidenció que los documentos eran creados y modificados correctamente, lo que valida el correcto uso de Mongoose como ORM.
 
-## Conclusiones
+---
 
-Durante el desarrollo de esta práctica se logró:
+## 6. DISCUSIÓN
 
-1. **Implementar con éxito** un sistema de gestión de laboratorios usando MongoDB y Mongoose
-2. **Configurar correctamente** el entorno de desarrollo con Docker Compose
-3. **Establecer relaciones** entre colecciones usando referencias y el método .populate()
-4. **Desarrollar consultas avanzadas** utilizando el Aggregation Framework de MongoDB
-5. **Aplicar buenas prácticas** en el modelado de datos NoSQL
+Comparando la teoría con la práctica, se pudo confirmar la utilidad de una arquitectura modular al desarrollar una API. El uso de Mongoose permitió definir esquemas robustos y validaciones claras. Asimismo, Express.js facilitó la gestión de rutas y middleware. El aprendizaje práctico permitió reforzar conceptos como operaciones CRUD, validaciones de datos y organización del código en controladores, rutas y modelos.
 
+---
 
-## Referencias
+## 7. CONCLUSIONES
 
-1. [Documentación oficial de MongoDB](https://docs.mongodb.com/)
-2. [Documentación de Mongoose](https://mongoosejs.com/docs/)
-3. [Docker Documentation](https://docs.docker.com/)
-4. [Express.js Documentation](https://expressjs.com/)
+* Se logró implementar una API RESTful funcional y modular utilizando Express y Mongoose.
+* La estructura definida facilitó la mantenibilidad y escalabilidad del proyecto.
+* Las validaciones aplicadas a nivel de modelo permitieron garantizar la integridad de los datos.
+* El uso de herramientas como Postman y mongo-express permitió validar el correcto funcionamiento del sistema.
+
+---
+
+## 8. BIBLIOGRAFÍA
+
+* MongoDB Inc. (2024). *Mongoose Documentation*. [https://mongoosejs.com/docs/](https://mongoosejs.com/docs/)
+* Express.js Foundation. (2024). *Express Documentation*. [https://expressjs.com/](https://expressjs.com/)
+* Postman. (2024). *Postman Learning Center*. [https://learning.postman.com/](https://learning.postman.com/)
+
